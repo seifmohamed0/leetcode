@@ -1,0 +1,45 @@
+class Solution {
+public:
+    set<array<int,2>>st;
+    bool vis[100005];
+    vector<int>vi[100005];
+    int timer = 0 , low[100005] , tin[100005];
+    void dfs(int node , int par){
+        vis[node] = true;
+        low[node] = tin[node] = ++timer;
+        for(auto it : vi[node]){
+            if(it == par)continue;
+            if(vis[it]){
+                low[node] = min(low[node] ,tin[it]);
+            }else{
+                dfs(it , node );
+                low[node] = min(low[node] , low[it]);
+                if(low[it] > tin[node]){
+                    st.insert({min(node , it) , max(node , it)});
+                }
+            }
+        }
+    }
+    vector<vector<int>> criticalConnections(int n, vector<vector<int>>& connections) {
+        for(int i = 0 ; i < n ; i++){
+            low[i] = tin[i] = vis[i] = false;
+        }
+        for(int i = 0 ; i < (int)connections.size() ; i++){
+            int u  = connections[i][0] , v = connections[i][1];
+            vi[u].push_back(v);
+            vi[v].push_back(u);
+        }
+        for(int i = 0 ; i < n ; i++){
+            if(!vis[i])
+                dfs(i , -1 );
+        }
+        vector<vector<int>>ret;
+        for(auto it : st){
+            vector<int>curr;
+            curr.push_back(it[0]);
+            curr.push_back(it[1]);
+            ret.push_back(curr);
+        }
+        return ret;
+    }
+};
